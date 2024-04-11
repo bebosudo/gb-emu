@@ -39,3 +39,11 @@ doc/
 # Clion
 .idea/
 cmake-build-debug/
+
+# Test apps
+*.gb
+*.sav
+
+# Temporary files
+.cache/
+.bash_history
