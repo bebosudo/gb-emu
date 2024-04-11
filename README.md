@@ -1,8 +1,8 @@
 # gb-emu
 
-An open source GameBoy emulator written in C++.
+An open source GameBoy emulator, written in C++.
 
-## Dependency
+## Dependencies
 
 - [git](https://git-scm.com/)
 
@@ -24,6 +24,19 @@ On Fedora the required software can be installed with:
 
 ```shell
 sudo dnf install git make cmake g++ SDL2 SDL2-devel boost-devel
+```
+
+A container is available to quickly test the app. When using Podman run:
+
+```shell
+podman run \
+    --rm -it \
+    -v /path/to/roms/:/roms:z \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+    -e DISPLAY \
+    --security-opt label=type:container_runtime_t \
+        ghcr.io/leofracca/gb-emu \
+            /roms/rom.gb
 ```
 
 ## Building
