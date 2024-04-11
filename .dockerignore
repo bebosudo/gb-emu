@@ -1,0 +1,20 @@
+# Avoid invalidating the docker cache due to changes in the dockerfile itself
+Dockerfile
+
+# Ignore build changes
+build/
+bin/
+.gitignore
+.git/
+
+# Ignore test files
+data/
+*.gb
+*.sav
+
+# Ignore docs changes
+Doxyfile
+PanDocs/
+images/
+LICENSE
+README.md

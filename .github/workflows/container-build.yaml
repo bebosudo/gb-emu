@@ -1,0 +1,33 @@
+name: Build gb-emu container image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  container-build:
+    #if: github.repository == 'MultiQC/api.multiqc.info'
+    name: Build gb-emu container image and push to ghcr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out git repo
+        uses: actions/checkout@v4
+
+      - name: Extract latest commit id
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Login to GitHub Container Registry (ghcr.io)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ env.sha_short }}
