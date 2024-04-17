@@ -1,0 +1,75 @@
+id: io.github.bebosudo.gb-emu
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: gbemu-launcher
+modules:
+  - name: boost
+    buildsystem: simple
+    sources:
+      - type: archive
+        url: https://boostorg.jfrog.io/artifactory/main/release/1.85.0/source/boost_1_85_0.tar.bz2
+        sha256: 7009fe1faa1697476bdc7027703a2badb84e849b7b0baad5086b087b971f8617
+        x-checker-data:
+          type: anitya
+          project-id: 6845
+          stable-only: true
+          url-template: https://boostorg.jfrog.io/artifactory/main/release/$version/source/boost_${major}_${minor}_${patch}.tar.bz2
+    build-commands:
+      - ./bootstrap.sh --prefix=${FLATPAK_DEST} --with-libraries=program_options,regex
+      - ./b2 variant=release link=shared runtime-link=shared cxxflags="$CXXFLAGS"
+        linkflags="$LDFLAGS" -j $FLATPAK_BUILDER_N_JOBS install
+
+  - name: sdl2
+    buildsystem: autotools
+    config-opts: ["--disable-static"]
+    sources:
+      - type: archive
+        url: https://libsdl.org/release/SDL2-2.30.2.tar.gz
+        sha256: 891d66ac8cae51361d3229e3336ebec1c407a8a2a063b61df14f5fdf3ab5ac31
+    cleanup: ["/bin/sdl2-config",
+              "/include",
+              "/lib/libSDL2.la",
+              "/lib/libSDL2main.a",
+              "/lib/libSDL2main.la",
+              "/lib/libSDL2_test.a",
+              "/lib/libSDL2_test.la",
+              "/lib/cmake",
+              "/share/aclocal",
+              "/lib/pkgconfig"]
+
+  - name: cmake-build
+    buildsystem: cmake
+    sources:
+      - type: dir
+        path: data/
+        dest: data/
+      - type: dir
+        path: include/
+        dest: include/
+      - type: dir
+        path: src/
+        dest: src/
+      - type: dir
+        path: tests/
+        dest: tests/
+      - type: dir
+        path: third_party/
+        dest: third_party/
+      - type: file
+        path: CMakeLists.txt
+      - type: file
+        path: gbemu-launcher
+    post-install:
+      - install -D gbemu /app/bin/gbemu
+      - install -D gbemu-launcher /app/bin/gbemu-launcher
+
+  # - name: fakebuild  # to speed up the build, manually build the project first then enable this
+  #                    # module instead of the cmake-build module
+  #   buildsystem: simple
+  #   sources:
+  #     - type: dir
+  #       path: .
+  #   build-commands:
+  #     - install -Dm755 build/gbemu /app/bin/gbemu
+  #     - install -Dm555 gbemu-launcher /app/bin/gbemu-launcher
